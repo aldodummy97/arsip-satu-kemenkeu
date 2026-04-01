@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arsip Satu — Chrome Extension untuk Satu Kemenkeu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --blue:      #005fac;
+      --blue-dk:   #004175;
+      --blue-lt:   #dbeeff;
+      --blue-mid:  #b3d4f0;
+      --blue-xlt:  #f0f7ff;
+      --gold:      #f5a623;
+      --gold-dk:   #d4891a;
+      --gold-lt:   #fff8ec;
+      --green:     #16a34a;
+      --green-lt:  #dcfce7;
+      --red:       #dc2626;
+      --text:      #0d1b2e;
+      --text2:     #374151;
+      --muted:     #6b7280;
+      --border:    #dce8f3;
+      --border2:   #c5d8ec;
+      --bg:        #f4f8fc;
+      --white:     #ffffff;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'Inter', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 60px;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .nav-logo {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,95,172,.3);
+    }
+
+    .nav-logo svg { width: 16px; height: 16px; stroke: #fff; }
+
+    .nav-name { font-size: 15px; font-weight: 800; color: var(--blue); }
+
+    .nav-links { display: flex; gap: 4px; }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 7px;
+      transition: all .15s;
+    }
+
+    .nav-link:hover { color: var(--blue); background: var(--blue-lt); }
+
+    .nav-right { display: flex; gap: 8px; align-items: center; }
+
+    .btn-nav-ghost {
+      font-size: 13px; font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      transition: all .15s;
+    }
+
+    .btn-nav-ghost:hover { border-color: var(--blue-mid); color: var(--blue); }
+
+    .btn-nav-primary {
+      font-size: 13px; font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 7px;
+      background: var(--blue);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all .15s;
+      box-shadow: 0 2px 8px rgba(0,95,172,.25);
+    }
+
+    .btn-nav-primary:hover { background: var(--blue-dk); }
+    .btn-nav-primary svg { width: 13px; height: 13px; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 120px 32px 80px;
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 72px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--blue);
+      background: var(--blue-lt);
+      border: 1.5px solid var(--blue-mid);
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 22px;
+      font-family: var(--mono);
+      letter-spacing: .3px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 3px rgba(245,166,35,.25);
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    h1 .grad {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 36px;
+      line-height: 1.7;
+      max-width: 420px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--blue);
+      padding: 12px 22px;
+      border-radius: 9px;
+      text-decoration: none;
+      transition: all .15s;
+      box-shadow: 0 4px 14px rgba(0,95,172,.3);
+    }
+
+    .btn-primary:hover { background: var(--blue-dk); transform: translateY(-1px); }
+    .btn-primary svg { width: 15px; height: 15px; }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--blue);
+      background: var(--white);
+      padding: 12px 22px;
+      border-radius: 9px;
+      border: 1.5px solid var(--blue-mid);
+      text-decoration: none;
+      transition: all .15s;
+    }
+
+    .btn-outline:hover { background: var(--blue-lt); }
+
+    .hero-chips {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .hchip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+
+    .hchip svg { width: 12px; height: 12px; color: var(--blue); }
+
+    /* ── POPUP PREVIEW ── */
+    .preview-wrap {
+      position: relative;
+      perspective: 800px;
+      perspective-origin: center center;
+    }
+
+    .preview-glow {
+      position: absolute;
+      inset: -30px;
+      background: radial-gradient(ellipse, rgba(0,95,172,.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .preview-card {
+      position: relative;
+      z-index: 1;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow:
+        0 20px 60px rgba(0,65,117,.14),
+        0 4px 16px rgba(0,65,117,.06),
+        0 0 0 1px rgba(255,255,255,.8) inset;
+      transform-style: preserve-3d;
+      transform: rotateX(0deg) rotateY(0deg);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      will-change: transform;
+      cursor: grab;
+    }
+
+    .preview-card.idle {
+      animation: float-idle 5s ease-in-out infinite;
+      transition: transform 0.6s ease, box-shadow 0.6s ease;
+    }
+
+    @keyframes float-idle {
+      0%,100%{ transform: rotateX(4deg) rotateY(-4deg) translateY(0); }
+      50%    { transform: rotateX(-4deg) rotateY(4deg) translateY(-10px); }
+    }
+
+    /* Shine overlay for 3D effect */
+    .preview-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: radial-gradient(
+        circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255,255,255,.25) 0%,
+        transparent 60%
+      );
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .preview-card.active::before { opacity: 1; }
+
+    .pc-hdr {
+      background: var(--blue);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pc-hdr-left { display: flex; align-items: center; gap: 8px; }
+
+    .pc-icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.22);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pc-icon svg { width: 13px; height: 13px; stroke: #fff; }
+
+    .pc-title-txt { font-size: 12px; font-weight: 800; color: #fff; }
+    .pc-sub-txt   { font-size: 9px; color: rgba(255,255,255,.6); margin-top: 1px; }
+
+    .pc-badge {
+      font-size: 9.5px; font-weight: 800;
+      color: var(--blue-dk);
+      background: var(--gold);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .pc-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 9px; }
+
+    .pc-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      border: 1.5px solid var(--blue-mid);
+      border-radius: 999px;
+      background: var(--blue-lt);
+      color: var(--blue);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .pc-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+    .pc-stages { display: flex; gap: 3px; }
+    .pc-stage { flex:1; height:2.5px; border-radius:999px; background:var(--border); }
+    .pc-stage.done   { background: var(--green); }
+    .pc-stage.active { background: var(--gold); animation: stg 1.5s ease-in-out infinite; }
+    @keyframes stg { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    .pc-btns { display: flex; gap: 6px; }
+    .pc-btn { flex:1; padding:7px; border-radius:8px; font-size:10px; font-weight:700; text-align:center; }
+    .pc-btn.s { background:var(--blue); color:#fff; }
+    .pc-btn.x { background:var(--white); color:var(--red); border:1.5px solid rgba(220,38,38,.3); }
+
+    .pc-status { display:flex; align-items:center; justify-content:space-between; }
+    .pc-status-left { display:flex; align-items:center; gap:6px; font-size:9.5px; color:var(--muted); }
+    .pc-live { width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 0 2px rgba(22,163,74,.2); animation:blink 1.2s infinite; }
+
+    .pc-chips { display:flex; gap:6px; }
+    .pc-chip { flex:1; border-radius:8px; padding:7px 9px; }
+    .pc-chip.cb { background:var(--blue-lt); border:1.5px solid var(--blue-mid); }
+    .pc-chip.cg { background:var(--gold-lt); border:1.5px solid rgba(245,166,35,.3); }
+    .pc-chip-l { font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; margin-bottom:2px; }
+    .pc-chip.cb .pc-chip-l { color:var(--blue); }
+    .pc-chip.cg .pc-chip-l { color:var(--gold-dk); }
+    .pc-chip-v { font-size:20px; font-weight:800; font-family:var(--mono); line-height:1; }
+    .pc-chip.cb .pc-chip-v { color:var(--blue-dk); }
+    .pc-chip.cg .pc-chip-v { color:var(--gold-dk); }
+
+    .pc-bar { height:3.5px; background:var(--border); border-radius:999px; overflow:hidden; }
+    .pc-bar-fill {
+      height:100%; width:65%;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      border-radius:999px;
+      position:relative; overflow:hidden;
+    }
+    .pc-bar-fill::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
+      animation:sweep 2s infinite linear;
+    }
+    @keyframes sweep { from{transform:translateX(-100%)} to{transform:translateX(200%)} }
+
+    .pc-log {
+      background: var(--blue-lt);
+      border: 1.5px solid var(--blue-mid);
+      border-radius: 7px;
+      padding: 6px 8px;
+      font-family: var(--mono);
+      font-size: 8.5px;
+      line-height: 1.7;
+    }
+
+    .pc-log .l-ts  { color: #6b9cc2; }
+    .pc-log .l-ok  { color: var(--green); }
+    .pc-log .l-inf { color: var(--blue); }
+    .pc-log .l-w   { color: var(--text2); }
+
+    .pc-foot {
+      padding: 6px 14px 10px;
+      text-align: center;
+      font-size: 8.5px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .pc-foot a { color: var(--blue); text-decoration: none; font-weight: 600; }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      background: var(--blue);
+      padding: 24px 32px;
+    }
+
+    .stats-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .stat { text-align: center; }
+
+    .stat-val {
+      display: block;
+      font-size: 30px;
+      font-weight: 900;
+      font-family: var(--mono);
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,.65);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      overflow: hidden;
+      position: relative;
+      background: var(--white);
+    }
+
+    .marquee-wrap::before,
+    .marquee-wrap::after {
+      content:''; position:absolute; top:0; bottom:0; width:100px; z-index:2;
+    }
+    .marquee-wrap::before { left:0; background:linear-gradient(90deg, var(--white), transparent); }
+    .marquee-wrap::after  { right:0; background:linear-gradient(270deg, var(--white), transparent); }
+
+    .marquee-track {
+      display:flex; gap:0;
+      animation: marquee 30s linear infinite;
+      width: max-content;
+    }
+
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    .marquee-item {
+      display:flex; align-items:center; gap:7px;
+      padding: 0 28px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      border-right: 1px solid var(--border);
+    }
+
+    .marquee-item svg { width:13px; height:13px; color:var(--blue); }
+
+    /* ── SECTION COMMON ── */
+    .section {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 80px 32px;
+      scroll-margin-top: 72px;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: var(--mono);
+      font-weight: 600;
+      color: var(--blue);
+      background: var(--blue-lt);
+      border: 1.5px solid var(--blue-mid);
+      padding: 3px 10px;
+      border-radius: 5px;
+      margin-bottom: 12px;
+      letter-spacing: .3px;
+    }
+
+    h2 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -.8px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .section-sub {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 44px;
+      max-width: 460px;
+    }
+
+    /* ── INSTALL ── */
+    .install-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .install-step {
+      background: var(--white);
+      padding: 28px;
+      transition: background .15s;
+    }
+
+    .install-step:hover { background: var(--blue-xlt); }
+
+    .step-n {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 12px;
+      letter-spacing: .3px;
+    }
+
+    .install-step h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .install-step p  { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+    .install-step code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--blue);
+      background: var(--blue-lt);
+      border: 1px solid var(--blue-mid);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    /* ── FEATURES ── */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .feat-card {
+      background: var(--white);
+      padding: 28px;
+      transition: background .15s;
+      position: relative;
+    }
+
+    .feat-card::after {
+      content:'';
+      position:absolute;
+      bottom:0; left:0; right:0;
+      height:3px;
+      background:linear-gradient(90deg, var(--blue), var(--gold));
+      opacity:0;
+      transition:opacity .2s;
+    }
+
+    .feat-card:hover { background: var(--blue-xlt); }
+    .feat-card:hover::after { opacity:1; }
+
+    .feat-icon {
+      width: 38px; height: 38px;
+      border-radius: 9px;
+      background: var(--blue-lt);
+      border: 1.5px solid var(--blue-mid);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .feat-icon svg { width: 17px; height: 17px; color: var(--blue); }
+
+    .feat-card h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .feat-card p  { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .feat-card code { font-family:var(--mono); font-size:11px; color:var(--blue); background:var(--blue-lt); border:1px solid var(--blue-mid); padding:1px 5px; border-radius:3px; }
+
+    /* ── CHANGELOG ── */
+    .cl-grid {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .cl-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cl-row:last-child { border-bottom: none; }
+
+    .cl-ver-cell {
+      padding: 24px;
+      background: var(--blue-xlt);
+      border-right: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      padding-top: 26px;
+    }
+
+    .cl-ver {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      background: var(--blue-lt);
+      border: 1.5px solid var(--blue-mid);
+      padding: 3px 9px;
+      border-radius: 5px;
+      height: fit-content;
+    }
+
+    .cl-content { padding: 24px 28px; background: var(--white); }
+    .cl-content h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .cl-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .cl-tag {
+      font-size: 11px;
+      font-family: var(--mono);
+      padding: 3px 9px;
+      border-radius: 4px;
+      border: 1px solid;
+    }
+
+    .cl-tag.new  { background:var(--green-lt); border-color:rgba(22,163,74,.3); color:var(--green); }
+    .cl-tag.fix  { background:var(--gold-lt);  border-color:rgba(245,166,35,.35); color:var(--gold-dk); }
+    .cl-tag.break{ background:#fef2f2; border-color:rgba(220,38,38,.3); color:var(--red); }
+
+    /* ── CTA ── */
+    .cta { max-width:1160px; margin:0 auto; padding:60px 32px; }
+
+    .cta-box {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dk) 100%);
+      border-radius: 16px;
+      padding: 60px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content:'';
+      position:absolute;
+      top:-60px; right:-60px;
+      width:300px; height:300px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(245,166,35,.2) 0%, transparent 65%);
+      pointer-events:none;
+    }
+
+    .cta-box::after {
+      content:'';
+      position:absolute;
+      bottom:-40px; left:-40px;
+      width:200px; height:200px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(255,255,255,.06) 0%, transparent 65%);
+      pointer-events:none;
+    }
+
+    .cta-box h2 { font-size:36px; color:#fff; margin-bottom:12px; }
+    .cta-box p  { font-size:15px; color:rgba(255,255,255,.7); margin-bottom:32px; }
+
+    .btn-cta {
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:14px; font-weight:700;
+      color:var(--blue-dk);
+      background:var(--gold);
+      padding:13px 26px;
+      border-radius:9px;
+      text-decoration:none;
+      transition:all .15s;
+      box-shadow:0 4px 16px rgba(245,166,35,.35);
+      position:relative; z-index:1;
+    }
+
+    .btn-cta:hover { background:#ffb43a; transform:translateY(-1px); }
+    .btn-cta svg { width:15px; height:15px; }
+
+    /* ── DIVIDER ── */
+    .divider { height:1px; background:var(--border); max-width:1160px; margin:0 auto; }
+
+    /* ── FOOTER ── */
+    .footer-wrap { border-top:1px solid var(--border); }
+
+    footer {
+      max-width:1160px;
+      margin:0 auto;
+      padding:20px 32px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .footer-brand {
+      display:flex; align-items:center; gap:9px;
+      font-size:13px; color:var(--muted);
+    }
+
+    .footer-brand .fl { width:22px; height:22px; border-radius:6px; background:var(--blue); display:flex; align-items:center; justify-content:center; }
+    .footer-brand .fl svg { width:11px; height:11px; stroke:#fff; }
+    .footer-brand strong { color:var(--blue); }
+
+    .footer-right { font-size:12px; font-family:var(--mono); color:var(--muted); }
+    .footer-right a { color:var(--gold-dk); text-decoration:none; font-weight:600; }
+
+    /* ── FADE ── */
+    .fade { opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease; }
+    .fade.in { opacity:1; transform:none; }
+    .d1{transition-delay:.08s} .d2{transition-delay:.16s} .d3{transition-delay:.24s}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      nav{padding:0 16px}
+      .nav-links{display:none}
+      .hero{grid-template-columns:1fr; padding:100px 16px 60px; gap:48px}
+      .preview-wrap{order:-1}
+      .section{padding:60px 16px}
+      .install-grid,.feat-grid{grid-template-columns:1fr}
+      .cl-row{grid-template-columns:1fr}
+      .cl-ver-cell{border-right:none; border-bottom:1px solid var(--border); padding:16px 24px}
+      h1{font-size:34px}
+      h2{font-size:24px}
+      .stats-inner{flex-wrap:wrap; gap:24px; justify-content:center}
+      .cta-box{padding:40px 24px}
+      .cta-box h2{font-size:26px}
+      footer{flex-direction:column; gap:10px; text-align:center}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div class="nav-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+      </svg>
+    </div>
+    <span class="nav-name">Arsip Satu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="#install" class="nav-link">Install</a>
+    <a href="#fitur" class="nav-link">Fitur</a>
+    <a href="#changelog" class="nav-link">Changelog</a>
+  </div>
+
+  <div class="nav-right">
+    <a href="https://instagram.com/aldowicaksanaa" target="_blank" class="btn-nav-ghost">@aldowicaks</a>
+    <a href="arsip-satu-extension-v2_0.zip" download class="btn-nav-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+      </svg>
+      Download
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      v2.0 · Satu Kemenkeu 2025
+    </div>
+    <h1>Arsip ratusan surat<br/><span class="grad">dalam hitungan menit.</span></h1>
+    <p class="hero-sub">Chrome extension untuk auto-arsip surat masuk di Satu Kemenkeu. Satu klik, berjalan sendiri sampai selesai.</p>
+    <div class="hero-btns">
+      <a href="arsip-satu-extension-v2_0.zip" download class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download Extension
+      </a>
+      <a href="#install" class="btn-outline">Cara Install →</a>
+    </div>
+    <div class="hero-chips">
+      <span class="hchip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Manifest V3</span>
+      <span class="hchip" style="color:#d1d5db">·</span>
+      <span class="hchip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> Internal only</span>
+      <span class="hchip" style="color:#d1d5db">·</span>
+      <span class="hchip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg> Open source</span>
+    </div>
+  </div>
+
+  <!-- POPUP PREVIEW -->
+  <div class="preview-wrap fade">
+    <div class="preview-glow"></div>
+    <div class="preview-card">
+      <div class="pc-hdr">
+        <div class="pc-hdr-left">
+          <div class="pc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="pc-title-txt">Arsip Satu Kemenkeu</div>
+            <div class="pc-sub-txt">satu.kemenkeu.go.id · NADINE</div>
+          </div>
+        </div>
+        <span class="pc-badge">v2.0</span>
+      </div>
+      <div class="pc-body">
+        <div class="pc-pill"><span class="pc-pill-dot"></span>Auto Archive</div>
+        <div class="pc-stages">
+          <div class="pc-stage done"></div>
+          <div class="pc-stage done"></div>
+          <div class="pc-stage active"></div>
+        </div>
+        <div class="pc-btns">
+          <div class="pc-btn s">▶ Start</div>
+          <div class="pc-btn x">■ Stop</div>
+        </div>
+        <div class="pc-status">
+          <div class="pc-status-left"><span class="pc-live"></span>Konfirmasi dialog…</div>
+          <span style="font-size:14px">📂</span>
+        </div>
+        <div class="pc-chips">
+          <div class="pc-chip cb">
+            <div class="pc-chip-l">Processed</div>
+            <div class="pc-chip-v">30</div>
+          </div>
+          <div class="pc-chip cg">
+            <div class="pc-chip-l">Remaining</div>
+            <div class="pc-chip-v">415</div>
+          </div>
+        </div>
+        <div class="pc-bar"><div class="pc-bar-fill"></div></div>
+        <div class="pc-log">
+          <span class="l-ts">[10:24:01]</span> <span class="l-w">Centang semua item.</span><br/>
+          <span class="l-ts">[10:24:03]</span> <span class="l-inf">Klik Arsipkan (10 item).</span><br/>
+          <span class="l-ts">[10:24:05]</span> <span class="l-w">Klik Simpan.</span><br/>
+          <span class="l-ts">[10:24:08]</span> <span class="l-ok">Batch: +10 | Processed: 30</span>
+        </div>
+      </div>
+      <div class="pc-foot">by <a href="https://instagram.com/aldowicaksanaa">aldo wicaks</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat fade"><span class="stat-val">10</span><span class="stat-label">Surat / batch</span></div>
+    <div class="stat fade d1"><span class="stat-val">~30s</span><span class="stat-label">Per batch</span></div>
+    <div class="stat fade d2"><span class="stat-val">v2.0</span><span class="stat-label">Versi terkini</span></div>
+    <div class="stat fade d3"><span class="stat-val">MV3</span><span class="stat-label">Manifest</span></div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="mq"></div>
+</div>
+
+<!-- INSTALL -->
+<section class="section" id="install">
+  <div class="fade">
+    <div class="section-tag">Panduan</div>
+    <h2>Install dalam 4 langkah</h2>
+    <p class="section-sub">Tidak perlu Chrome Web Store. Install langsung via Developer Mode, gratis.</p>
+  </div>
+  <div class="install-grid fade d1">
+    <div class="install-step">
+      <div class="step-n">01 —</div>
+      <h3>Download file ZIP</h3>
+      <p>Klik tombol <strong>Download Extension</strong>. File <code>.zip</code> akan tersimpan di folder Downloads.</p>
+    </div>
+    <div class="install-step">
+      <div class="step-n">02 —</div>
+      <h3>Ekstrak ZIP</h3>
+      <p>Klik kanan → <strong>Extract All</strong>. Simpan folder hasil ekstrak di tempat yang mudah — jangan dihapus.</p>
+    </div>
+    <div class="install-step">
+      <div class="step-n">03 —</div>
+      <h3>Buka halaman Extensions</h3>
+      <p>Buka Chrome → ketik <code>chrome://extensions</code> → aktifkan <strong>Developer mode</strong> di pojok kanan atas.</p>
+    </div>
+    <div class="install-step">
+      <div class="step-n">04 —</div>
+      <h3>Load unpacked</h3>
+      <p>Klik <strong>Load unpacked</strong> → pilih folder hasil ekstrak. Extension langsung aktif di toolbar.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FITUR -->
+<section class="section" id="fitur">
+  <div class="fade">
+    <div class="section-tag">Fitur</div>
+    <h2>Semua yang kamu butuhkan</h2>
+    <p class="section-sub">Dirancang khusus untuk UI Satu Kemenkeu versi 2025+.</p>
+  </div>
+  <div class="feat-grid fade d1">
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+      <h3>Auto Archive</h3>
+      <p>Centang, klik arsip, konfirmasi dialog — semua berjalan otomatis tanpa intervensi.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+      <h3>Counter Akurat</h3>
+      <p>Processed & Remaining dari paginator <code>"dari X"</code> — tidak bisa salah tab.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></div>
+      <h3>Auto Recovery</h3>
+      <p>Stuck? Extension otomatis retry setelah 5 cycle tanpa progres.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+      <h3>Custom Delay</h3>
+      <p>Atur jeda antar aksi (ms). Default 2000ms, bisa dikurangi sesuai koneksi.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+      <h3>Activity Log</h3>
+      <p>Log berwarna real-time tiap langkah: centang, klik, simpan, hasil batch.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+      <h3>Stage Indicator</h3>
+      <p>3 bar menunjukkan tahap yang sedang berjalan: centang → arsip → konfirmasi.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CHANGELOG -->
+<section class="section" id="changelog">
+  <div class="fade">
+    <div class="section-tag">Riwayat</div>
+    <h2>Changelog</h2>
+    <p class="section-sub">Update dan perbaikan di tiap versi.</p>
+  </div>
+  <div class="cl-grid fade d1">
+    <div class="cl-row">
+      <div class="cl-ver-cell"><span class="cl-ver">v2.0</span></div>
+      <div class="cl-content">
+        <h3>Full rewrite — UI baru Satu Kemenkeu 2025</h3>
+        <div class="cl-tags">
+          <span class="cl-tag new">Paginator "dari X" sbg sumber counter</span>
+          <span class="cl-tag new">Stage indicator aktif kuning / selesai hijau</span>
+          <span class="cl-tag new">Progress bar biru → hijau</span>
+          <span class="cl-tag new">Log biru muda + warna per tipe pesan</span>
+          <span class="cl-tag new">Dialog "Simpan" terdeteksi otomatis</span>
+          <span class="cl-tag fix">Counter processed tidak update — fixed</span>
+          <span class="cl-tag fix">Salah baca tab Disposisi — fixed</span>
+          <span class="cl-tag fix">totalInitial keracunan angka lain — fixed</span>
+          <span class="cl-tag break">Tidak kompatibel UI lama pre-2025</span>
+        </div>
+      </div>
+    </div>
+    <div class="cl-row">
+      <div class="cl-ver-cell"><span class="cl-ver">v1.7</span></div>
+      <div class="cl-content">
+        <h3>Versi awal — UI lama Satu Kemenkeu</h3>
+        <div class="cl-tags">
+          <span class="cl-tag new">Auto archive dasar</span>
+          <span class="cl-tag new">Counter processed & remaining</span>
+          <span class="cl-tag new">Activity log</span>
+          <span class="cl-tag fix">Selector fix v1.7 → v1.9</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <div class="cta-box fade">
+    <h2>Siap arsip ratusan surat?</h2>
+    <p>Download, install, tekan Start — selesai.</p>
+    <a href="arsip-satu-extension-v2_0.zip" download class="btn-cta">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      Download v2.0
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-wrap">
+  <footer>
+    <div class="footer-brand">
+      <div class="fl"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg></div>
+      <span>Arsip Satu · <strong>Internal Kemenkeu</strong></span>
+    </div>
+    <div class="footer-right">by <a href="https://instagram.com/aldowicaksanaa" target="_blank">@aldowicaksanaa</a></div>
+  </footer>
+</div>
+
+<script>
+  // Marquee
+  const items = [
+    {icon:'M13 10V3L4 14h7v7l9-11h-7z', label:'Auto Archive'},
+    {icon:'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10', label:'Counter Akurat'},
+    {icon:'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', label:'Auto Recovery'},
+    {icon:'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', label:'Activity Log'},
+    {icon:'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', label:'Custom Delay'},
+    {icon:'M5 13l4 4L19 7', label:'Stage Indicator'},
+    {icon:'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', label:'Open Source'},
+    {icon:'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label:'Manifest V3'},
+  ];
+
+  const mq = document.getElementById('mq');
+  const renderItems = () => items.map(it => `
+    <div class="marquee-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:var(--blue)">
+        <path stroke-linecap="round" stroke-linejoin="round" d="${it.icon}"/>
+      </svg>
+      ${it.label}
+    </div>`).join('');
+
+  mq.innerHTML = renderItems() + renderItems();
+
+  // Fade in
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.fade').forEach(el => io.observe(el));
+
+  // ── 3D CARD INTERACTION ──
+  const card = document.querySelector('.preview-card');
+  const wrap = document.querySelector('.preview-wrap');
+
+  if(card && wrap){
+    let isHovering = false;
+    let raf = null;
+    let targetRX = 0, targetRY = 0;
+    let currentRX = 0, currentRY = 0;
+
+    // Start idle animation
+    card.classList.add('idle');
+
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    function animate(){
+      if(!isHovering){
+        raf = null;
+        return;
+      }
+      currentRX = lerp(currentRX, targetRX, 0.12);
+      currentRY = lerp(currentRY, targetRY, 0.12);
+      card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) translateZ(20px)`;
+      card.style.boxShadow = `
+        ${-currentRY * 1.5}px ${currentRX * 1.5}px 40px rgba(0,65,117,.18),
+        0 30px 80px rgba(0,65,117,.12),
+        0 0 0 1px rgba(255,255,255,.8) inset
+      `;
+      raf = requestAnimationFrame(animate);
+    }
+
+    wrap.addEventListener('mouseenter', () => {
+      isHovering = true;
+      card.classList.remove('idle');
+      card.classList.add('active');
+      // Capture current rotation from idle animation as start point
+      const style = window.getComputedStyle(card);
+      card.style.transition = 'none';
+      if(raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(animate);
+    });
+
+    wrap.addEventListener('mousemove', (e) => {
+      const rect = wrap.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);   // -1 to 1
+      const dy = (e.clientY - cy) / (rect.height / 2);  // -1 to 1
+
+      targetRY =  dx * 18;   // max 18deg horizontal
+      targetRX = -dy * 14;   // max 14deg vertical
+
+      // Update shine position
+      const mx = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+      const my = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+      card.style.setProperty('--mx', mx + '%');
+      card.style.setProperty('--my', my + '%');
+    });
+
+    wrap.addEventListener('mouseleave', () => {
+      isHovering = false;
+      if(raf){ cancelAnimationFrame(raf); raf = null; }
+      card.classList.remove('active');
+      // Smooth return to idle
+      card.style.transition = 'transform 0.6s ease, box-shadow 0.6s ease';
+      card.style.transform = '';
+      card.style.boxShadow = '';
+      setTimeout(() => {
+        card.classList.add('idle');
+        card.style.transition = '';
+      }, 600);
+      targetRX = 0; targetRY = 0;
+      currentRX = 0; currentRY = 0;
+    });
+
+    // Touch support
+    wrap.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      const rect = wrap.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      targetRY =  ((t.clientX - cx) / (rect.width / 2)) * 14;
+      targetRX = -((t.clientY - cy) / (rect.height / 2)) * 10;
+    }, { passive: false });
+  }
+</script>
+</body>
+</html>
